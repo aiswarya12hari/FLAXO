@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gym_user/PROVIDERS/Checkin%20Page/checkinprovider.dart';
 import 'package:gym_user/SCREENS/Profile/profile_screen.dart';
+import 'package:gym_user/WIDGETS/appstyle.dart';
 import 'package:provider/provider.dart';
 
 import 'package:gym_user/SCREENS/Login/login_screen.dart';
@@ -23,44 +24,39 @@ class _CheckinoutScreenState extends State<CheckinoutScreen> {
   @override
   void initState() {
     super.initState();
-
-    /// Load User Data
     Future.microtask(() {
       context.read<CheckinProvider>().loadUserData();
     });
   }
 
-  /// Pull-to-Refresh Action
   Future<void> _handleRefresh() async {
     await context.read<CheckinProvider>().loadUserData();
   }
 
-  /// Check In Action
   Future<void> _handleCheckInOut() async {
-  final provider = context.read<CheckinProvider>();
+    final provider = context.read<CheckinProvider>();
 
-  final result = await Navigator.push<bool>(
-    context,
-    PageRouteBuilder<bool>(
-      opaque: false,
-      barrierColor: Colors.transparent,
-      pageBuilder: (context, _, __) => VerificationScreen(
-        userName: provider.userName,
-        userAvatar: '',
-        isCheckIn: true,
+    final result = await Navigator.push<bool>(
+      context,
+      PageRouteBuilder<bool>(
+        opaque: false,
+        barrierColor: Colors.transparent,
+        pageBuilder: (context, _, __) => VerificationScreen(
+          userName: provider.userName,
+          userAvatar: '',
+          isCheckIn: true,
+        ),
+        transitionsBuilder: (context, animation, _, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
       ),
-      transitionsBuilder: (context, animation, _, child) {
-        return FadeTransition(opacity: animation, child: child);
-      },
-    ),
-  );
+    );
 
-  if (result == true && mounted) {
-    // provider.updateAttendance();
+    if (result == true && mounted) {
+      // provider.updateAttendance();
+    }
   }
-}
 
-  /// Logout
   Future<void> _handleLogout() async {
     await context.read<CheckinProvider>().logout();
 
@@ -68,33 +64,28 @@ class _CheckinoutScreenState extends State<CheckinoutScreen> {
 
     Navigator.pushAndRemoveUntil(
       context,
-
       MaterialPageRoute(builder: (_) => const LoginScreen()),
-
       (route) => false,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    // Responsive helper
+    final sh = MediaQuery.of(context).size.height;
+
     return Consumer<CheckinProvider>(
       builder: (context, provider, child) {
         return Scaffold(
           backgroundColor: const Color(0xFFF0F0F0),
-
           body: SafeArea(
-            child: RefreshIndicator(
-              onRefresh: _handleRefresh,                      // 👈 Added
-              color: Colors.black,          // spinner color  // 👈 Customize
-              backgroundColor: Colors.white,                  // 👈 Customize
-              strokeWidth: 2.5,   
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 35),
-
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: AppStyle.text(context: context, size: 20).fontSize ?? 20,
+                vertical: sh * 0.04, // 4% of screen height instead of fixed 35
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
-
                 children: [
                   /// Header
                   HomeHeader(
@@ -110,37 +101,34 @@ class _CheckinoutScreenState extends State<CheckinoutScreen> {
                     },
                   ),
 
-                  const SizedBox(height: 40),
+                  SizedBox(height: sh * 0.045), // ~40px on 375 screen
 
                   /// Live Clock
                   const LiveClockWidget(),
 
-                  const SizedBox(height: 50),
+                  SizedBox(height: sh * 0.055), // ~50px on 375 screen
 
                   /// Check In Button
                   CheckInButton(isCheckedIn: false, onTap: _handleCheckInOut),
 
-                  const SizedBox(height: 30),
+                  SizedBox(height: sh * 0.035), // ~30px on 375 screen
 
                   /// Gym Name
                   LocationBadge(locationName: provider.gymName),
 
-                  const SizedBox(height: 44),
+                  const Spacer(),
 
                   /// Attendance Stats
                   AttendanceStatsRow(
                     checkInTime: provider.checkInTime,
-
                     // totalHours: provider.totalHours,
-
                     // checkOutTime: provider.checkOutTime,
                   ),
 
-                  const SizedBox(height: 18),
+                  SizedBox(height: sh * 0.02), // ~18px on 375 screen
                 ],
               ),
             ),
-          ),
           ),
         );
       },
