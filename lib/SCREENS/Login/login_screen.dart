@@ -193,14 +193,23 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 39),
 
                 /// Footer Links
+                // FooterLinks(
+                //   onForgotPassword: () {
+                //     debugPrint('Contact Admin tapped');
+                //   },
                 FooterLinks(
-                  onForgotPassword: () {
-                    debugPrint('Contact Admin tapped');
+                  onForgotPassword: () async {
+                    final Uri url = Uri.parse(
+                      'https://www.techfifoinnovations.com/',
+                    );
+                    await launchUrl(url, mode: LaunchMode.externalApplication);
                   },
 
                   /// Terms of Service
                   onTermsOfService: () async {
-                    final Uri url = Uri.parse('https://www.freeprivacypolicy.com/live/5454a70c-04ef-424a-b544-d0f962995a3d');
+                    final Uri url = Uri.parse(
+                      'https://www.freeprivacypolicy.com/live/5454a70c-04ef-424a-b544-d0f962995a3d',
+                    );
 
                     await launchUrl(url, mode: LaunchMode.externalApplication);
                   },
